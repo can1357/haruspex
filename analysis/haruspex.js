@@ -42,7 +42,6 @@ if (!argv._.includes("start")) {
 }
 
 const data = dataset.load(argv.dataset || "./raw-data/isa.json");
-console.log(data);
 
 const app = express();
 app.use("/static", express.static(path.join(__dirname, "public")));
@@ -61,5 +60,5 @@ app.get("/dataset.json", (req, res) => {
 
 const port = argv.port || 80;
 app.listen(port, () => {
-	console.log(`Example app listening at http://localhost:${port}`);
+	console.log(`Listening at http://localhost:${port}`);
 });

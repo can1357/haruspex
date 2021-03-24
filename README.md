@@ -1,6 +1,6 @@
 <p align="center">
 
-  <img width="256" heigth="256" src="https://raw.githubusercontent.com/can1357/Haruspex/master/analysis/public/logo.svg">
+  <img width="256" heigth="256" src="https://haruspex.can.ac/static/logo.svg">
 
   <h1 align="center">Haruspex</h1>
   <p align="center">
