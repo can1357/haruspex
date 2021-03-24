@@ -1,5 +1,6 @@
 const dataset = require("./dataset");
 const yargs = require("yargs");
+const compression = require("compression");
 const path = require("path");
 const express = require("express");
 const fs = require("fs");
@@ -44,6 +45,7 @@ if (!argv._.includes("start")) {
 const data = dataset.load(argv.dataset || __dirname + "/../raw-data/isa.json");
 
 const app = express();
+app.use(compression());
 app.use("/static", express.static(__dirname + "/public"));
 
 app.get("/", (req, res) => {
