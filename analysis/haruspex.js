@@ -41,10 +41,10 @@ if (!argv._.includes("start")) {
 	return;
 }
 
-const data = dataset.load(argv.dataset || "./raw-data/isa.json");
+const data = dataset.load(argv.dataset || __dirname + "/../raw-data/isa.json");
 
 const app = express();
-app.use("/static", express.static(path.join(__dirname, "public")));
+app.use("/static", express.static(__dirname + "/public"));
 
 app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/public/index.html");
