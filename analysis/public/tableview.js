@@ -141,7 +141,7 @@ async function visitTable(hexBase) {
 
 // Request the dataset.
 //
-const { instructions } = await (await fetch("/dataset.json")).json();
+const { instructions } = await (await fetch("/static/dataset.json")).json();
 
 // Build the table with the original location.
 //

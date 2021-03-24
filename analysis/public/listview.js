@@ -1,4 +1,4 @@
-let { instructions } = await (await fetch("/dataset.json")).json();
+let { instructions } = await (await fetch("/static/dataset.json")).json();
 instructions = Object.values(instructions);
 
 const keys = Object.keys(instructions[0]);
