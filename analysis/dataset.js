@@ -46,26 +46,28 @@ function parse(rawData) {
 	const instructions = {};
 	for (const entry of data) {
 		entry.opcode = Buffer.from(entry.opcode).toString("hex");
-		entry.mits = entry.uops[0] | 0;
-		entry.ms = entry.uops[2] | 0;
+		entry.mits = entry.uops[0] - faultBaseline.mits;
+		entry.ms = entry.uops[2] - faultBaseline.ms;
 		delete entry.uops;
 
-		if (entry.ms < nopBaseline.ms) {
+		if (
+			entry.ms < 0 ||
+			entry.mits < 0 ||
+			entry.category.includes("_BR") ||
+			entry.category.includes("CALL_")
+		) {
 			entry.branch = true;
-			entry.serializing = entry.mits <= faultBaseline.mits;
-		} else if (entry.mits <= faultBaseline.mits) {
-			entry.branch = null;
-			entry.serializing = true;
+			entry.serializing = null;
+			entry.ms = 0;
+			entry.mits = 0;
 		} else {
 			entry.branch = false;
-			entry.serializing = false;
+			entry.serializing = entry.mits == 0;
 		}
 		entry.speculationFence = entry.outOfOrder == 0;
 		instructions[entry.opcode] = entry;
 	}
 
-	// Purge reduntant prefixes.
-	//
 	const propertyMatch = (i1, i2) => {
 		return (
 			i2.ms == i1.ms &&
@@ -76,6 +78,47 @@ function parse(rawData) {
 			i2.valid == i1.valid
 		);
 	};
+
+	// Purge redundant suffixes.
+	//
+	let suffixPurgeCounter = 0;
+	const keysSorted = Object.keys(instructions).sort(function (a, b) {
+		return a.length - b.length;
+	});
+	for (const key of keysSorted) {
+		const evaluate = (k1, ki1) => {
+			const i1 = instructions[ki1];
+			if (!i1) {
+				return;
+			}
+
+			let matches = [];
+			for (let n = 0; n <= 0xff; n++) {
+				const k2 = k1 + hexb(n);
+				const i2 = instructions[k2];
+				if (i2 && propertyMatch(i1, i2)) {
+					matches.push(k2);
+				}
+			}
+
+			if (matches.length < 256) {
+				return false;
+			}
+
+			let success = false;
+			for (const k2 of matches) {
+				if (k2 != ki1) {
+					delete instructions[k2];
+					suffixPurgeCounter++;
+					success = true;
+				}
+			}
+			return success;
+		};
+		if (evaluate(key, key) || key.length > 2) {
+			evaluate(key.substr(0, key.length - 2), key);
+		}
+	}
 
 	// Purge redundant prefixes.
 	//
@@ -103,7 +146,7 @@ function parse(rawData) {
 					// Otherwise MITS#1 has to be one more than MITS#2 since it should execute one more NOP.
 					//
 					if (i1.mits != i2.mits) {
-						if (i1.mits != i2.mits + 1) {
+						if (i1.mits != i2.mits + nopUops) {
 							continue;
 						}
 					} else if (i1.mits > faultBaseline.mits) {
@@ -117,53 +160,12 @@ function parse(rawData) {
 		}
 	}
 
-	// Purge redundant suffixes.
-	//
-	let suffixPurgeCounter = 0;
-	const keysSorted = Object.keys(instructions).sort(function (a, b) {
-		return a.length - b.length;
-	});
-	for (const key of keysSorted) {
-		const eval = (k1, ki1) => {
-			const i1 = instructions[ki1];
-			if (!i1) {
-				return;
-			}
-
-			let matchCount = 0;
-			for (let n = 0; n <= 0xff; n++) {
-				const k2 = k1 + hexb(n);
-				const i2 = instructions[k2];
-				if (!i2) {
-					continue;
-				}
-				if (!propertyMatch(i1, i2)) {
-					matchCount = 0;
-					break;
-				}
-				matchCount++;
-			}
-			if (matchCount != 0) {
-				for (let n = 0; n <= 0xff; n++) {
-					const k2 = k1 + hexb(n);
-					if (k2 != ki1 || k1 in instructions) {
-						delete instructions[k2];
-						suffixPurgeCounter++;
-					}
-				}
-			}
-		};
-		eval(key.substr(0, key.length - 2), key);
-	}
-
 	// Return the parsed entry.
 	//
 	return {
 		instructions,
 		prefixPurgeCounter,
 		suffixPurgeCounter,
-		nopBaseline,
-		faultBaseline,
 		nopUops,
 	};
 }

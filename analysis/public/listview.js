@@ -2,7 +2,7 @@
 const header = [
     { key: "opcode",           title: "Opcode",            detail: "Sample byte array" },
     { key: "decoding",         title: "Decoding",          detail: "Disassembly of the sample according to XED" },
-    { key: "valid",            title: "Valid",             detail: "Expected to execute on the processor or not" },
+    { key: "valid",            title: "Recognized",        detail: "Expected to execute on the processor or not" },
     { key: "serializing",      title: "Serializing",       detail: "Enforces ordering of the pipeline, if not also a speculative fence, means only applicable to the memory accesses" },
     { key: "speculationFence", title: "Speculation Fence", detail: "Halts speculative execution" },
     { key: "iclass",           title: "Class",             detail: "Instruction class according to XED" },
@@ -24,5 +24,5 @@ document.addEventListener("WebComponentsReady", async () => {
 	const worker = perspective.worker();
 	const table = worker.table(await data, { index: "opcode" });
 	await el.load(table);
-	el._toggle_config();
+	el.toggleConfig();
 });
