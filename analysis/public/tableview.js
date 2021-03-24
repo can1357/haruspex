@@ -78,14 +78,15 @@ async function visitTable(hexBase) {
 
 	// Iterate every opcode.
 	//
+	const optbl = Object.keys(instructions);
 	for (let i = 0; i <= 0xff; i++) {
 		// Convert the full and partial opcode to hex.
 		//
 		const subHex = hexb(i);
 
-		// Count the
+		// Filter the table by the opcode.
 		//
-		const list = Object.keys(instructions).filter((k) => k.startsWith(hexBase + subHex));
+		const list = optbl.filter((k) => k.startsWith(hexBase + subHex));
 		const udList = list.filter((k) => !instructions[k].valid);
 
 		// Reset the table entry.
