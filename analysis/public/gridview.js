@@ -133,7 +133,7 @@ async function visitTable(hexBase) {
 				visitTable(hexBase + subHex);
 			};
 		} else {
-			item.classList += " color-text-tertiary";
+			item.classList += " color-text-tertiary color-bg-tertiary";
 			item.onclick = () => {};
 		}
 	}
