@@ -138,6 +138,7 @@ async function visitTable(hexBase) {
 			};
 		} else {
 			item.classList += " op-inactive";
+			item.onclick = () => {};
 		}
 	}
 }
