@@ -1,5 +1,7 @@
 <p align="center">
-  <h1 align="center">Haruspex</h1>
+<h1 align="center">Haruspex</h1>
+<h4 align="center">/həˈrʌspeks/</h4>
+<h6 align="center">a religious official in ancient Rome who predicted the future or interpreted the meaning of events by examining the insides of birds or animals that had been sacrificed.</h6>
   <p align="center">
     Exploration of x86-64 ISA using speculative execution.
   </p>
