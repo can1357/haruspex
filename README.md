@@ -1,4 +1,7 @@
 <p align="center">
+
+  <img width="256" heigth="256" src="https://raw.githubusercontent.com/can1357/Haruspex/master/analysis/public/logo.svg">
+
   <h1 align="center">Haruspex</h1>
   <p align="center">
     Exploration of x86-64 ISA using speculative execution.

@@ -12,6 +12,14 @@ body {
 	width: 100vw;
 }
 
+.logo {
+	position: fixed;
+	top: 5%;
+	left: 5%;
+	width: 10%;
+	height: 10%;
+}
+
 .grid {
 	width: 64%;
 	height: 64%;
