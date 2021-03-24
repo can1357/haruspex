@@ -306,10 +306,12 @@ struct result_entry
 	auto baseline = test_decode( std::initializer_list<uint8_t>{ 0x90 } );
 	auto baseline_ft = test_decode( std::initializer_list<uint8_t>{ 0xCE } );
 	auto baseline_ft2 = test_decode( std::initializer_list<uint8_t>{ 0x90, 0xCE } );
+	auto baseline_div = test_out_of_order( std::initializer_list<uint8_t>{ 0xCE } );
 	uint64_t nop_uops = baseline_ft2[ 0 ] - baseline_ft[ 0 ];
 	xstd::log( "Baseline          : %s\n", baseline );
 	xstd::log( "Faulting Baseline : %s\n", baseline_ft );
 	xstd::log( "Nop uOps          : %llu\n", nop_uops );
+	xstd::log( "Div baseline      : %llu\n", baseline_div );
 	if ( !nop_uops  ||                                               // nop did not dispatch through MITE
 		 baseline_ft2[ 2 ] != baseline_ft[ 2 ] ||                    // nop dispatched through MS
 		 baseline_ft[ 1 ] != 0 || 					                 // DBS dispatched instructions
@@ -363,7 +365,7 @@ struct result_entry
 
 		// Do the out-of-order execution measurement and append to the list.
 		//
-		result.oo_cycles = test_out_of_order( opc );
+		result.oo_cycles = std::max<int64_t>( test_out_of_order( opc ) - baseline_div, 0ll );
 		results.emplace_back( result );
 	};
 
