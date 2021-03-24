@@ -16,7 +16,7 @@ const header = [
 ];
 
 const data = (async () => {
-	return Object.values((await (await fetch("/dataset.json")).json()).instructions);
+	return Object.values((await (await fetch("/static/dataset.json")).json()).instructions);
 })();
 
 document.addEventListener("WebComponentsReady", async () => {
