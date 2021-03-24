@@ -86,7 +86,7 @@ async function visitTable(hexBase) {
 
 		// Filter the table by the opcode.
 		//
-		const list = scopeTable.filter((k) => k.startsWith(hexBase + subHex));
+		const list = scopeTable.filter((k) => k.substr(hexBase.length, 2) === subHex);
 		const udList = list.filter((k) => !instructions[k].valid);
 
 		// Reset the table entry.
