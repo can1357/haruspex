@@ -1,0 +1,5 @@
+node_modules/
+raw-data/*.cache*
+package-lock.json
+raw-data/*.json
+.vscode/

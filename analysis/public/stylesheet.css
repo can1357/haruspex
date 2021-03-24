@@ -1,0 +1,72 @@
+:root {
+	--group-color: #e6db3e;
+	--active-color: #ffffff;
+	--inactive-color: #545454;
+	--prefix-color: #6079ab;
+	--undocumented-color: #6b1313;
+}
+
+body {
+	background-color: #212529;
+	height: 100vh;
+	width: 100vw;
+}
+
+.grid {
+	width: 64%;
+	height: 64%;
+	position: fixed;
+	top: 18%;
+	left: 18%;
+}
+
+.op-tbl {
+	table-layout: fixed !important;
+}
+.op-td {
+	width: 4%;
+	height: 4%;
+}
+.op-td:hover {
+	background-color: #33383f !important;
+}
+.op-td:not(.op-inactive):hover {
+	cursor: pointer;
+}
+
+.op-tbl-prev {
+	user-select: none;
+	height: 4%;
+}
+.op-tbl-prev-button {
+	cursor: pointer;
+}
+
+.op-group {
+	color: var(--group-color);
+}
+.op-active {
+	color: var(--active-color);
+}
+.op-inactive {
+	color: var(--inactive-color);
+}
+.op-prefix {
+	color: var(--prefix-color);
+}
+.op-undocumented {
+	border-bottom-color: var(--undocumented-color) !important;
+}
+.op-counter {
+	font-size: x-small;
+}
+.op-entry {
+	font-size: xx-small;
+}
+.op-text {
+}
+
+.entry {
+	background-color: rgba(86, 61, 124, 0.15);
+	border: 1px solid rgba(86, 61, 124, 0.15);
+}
