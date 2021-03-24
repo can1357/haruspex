@@ -56,7 +56,7 @@ async function visitTable(hexBase) {
 		for (let i = 0; i < hexBase.length; i += 2) {
 			header.insertAdjacentHTML(
 				"beforeend",
-				`<li class="breadcrumb-item"><a>${hexBase.substr(i, 2)}</a></li>`
+				`<li class="breadcrumb-item op-button"><a>${hexBase.substr(i, 2)}</a></li>`
 			);
 
 			header.lastChild.onclick = () => {
