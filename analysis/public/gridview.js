@@ -48,6 +48,10 @@ for (let n = 0; n <= 0xf; n++) {
 	tbl.appendChild(row);
 }
 
+// Request the dataset.
+//
+const { instructions } = await (await fetch("/static/dataset.json")).json();
+
 async function visitTable(hexBase) {
 	const header = document.getElementById("crumbs");
 	if (hexBase.length) {
@@ -138,10 +142,6 @@ async function visitTable(hexBase) {
 		}
 	}
 }
-
-// Request the dataset.
-//
-const { instructions } = await (await fetch("/static/dataset.json")).json();
 
 // Build the table with the original location.
 //

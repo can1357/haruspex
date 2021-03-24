@@ -63,7 +63,15 @@ function parse(rawData) {
 	// Purge reduntant prefixes.
 	//
 	const propertyMatch = (i1, i2) => {
-		return i2.ms == i1.ms && i2.outOfOrder == i1.outOfOrder && i2.iclass == i1.iclass;
+		return (
+			i2.ms == i1.ms &&
+			i2.outOfOrder == i1.outOfOrder &&
+			i2.iclass == i1.iclass &&
+			i2.category == i1.category &&
+			i2.extension == i1.extension &&
+			i2.cpl == i1.cpl &&
+			i2.valid == i1.valid
+		);
 	};
 	var prefixPurgeCounter = 0;
 	for (const k1 of Object.keys(instructions)) {
@@ -110,7 +118,7 @@ function parse(rawData) {
 		// Skip if already deleted or not relevant.
 		//
 		const i1 = instructions[k1];
-		if (!i1 || k1.length <= 2 || !k1.endsWith("90")) {
+		if (!i1 || k1.length <= 2 || !i1.valid) {
 			continue;
 		}
 
@@ -154,7 +162,7 @@ function load(path, noCache = false) {
 	const data = fs.readFileSync(path);
 	const sha256 = crypto.createHash("sha256");
 	sha256.update(data);
-	const hash = sha256.digest().toString("hex").substr(0, 4);
+	const hash = sha256.digest().toString("hex").substr(0, 8);
 
 	// See if there is a cached instance, if so return without parsing.
 	//
