@@ -1,80 +1,35 @@
 html {
-  height: 100%;
-  margin: 0px;
+	height: 100%;
+	margin: 0px;
 }
 
 body {
-  min-height: 100%;
-  margin: 0px;
+	min-height: 100%;
+	margin: 0px;
 }
 
 main {
-  max-width: 1024px;
-  height: 100%;
+	max-width: 1024px;
+	height: 100%;
 }
 
 td {
-  width: 64px;
-  height: 64px;
-  padding: 0 !important;
-}
-
-/* 
-.grid {
-	width: 64%;
-	height: 64%;
-	position: fixed;
-	top: 18%;
-	left: 18%;
-}
-
-.op-tbl {
-	table-layout: fixed !important;
-}
-.op-td {
-	width: 4%;
-	height: 4%;
-}
-.op-td:hover {
-	background-color: #33383f !important;
-}
-.op-td:not(.op-inactive):hover {
-	cursor: pointer;
-}
-
-.op-tbl-prev {
-	user-select: none;
-	height: 4%;
-}
-.op-tbl-prev-button {
-	cursor: pointer;
-}
-
-.op-group {
-	color: var(--group-color);
-}
-.op-active {
-	color: var(--active-color);
-}
-.op-inactive {
-	color: var(--inactive-color);
-}
-.op-prefix {
-	color: var(--prefix-color);
+	width: 64px;
+	height: 64px;
+	padding: 0 !important;
 }
 .op-undocumented {
-	border-bottom-color: var(--undocumented-color) !important;
+	border-bottom-color: red !important;
 }
+
 .op-counter {
+	color: var(--color-text-primary);
 	font-size: x-small;
 }
 .op-entry {
-	font-size: xx-small;
+	color: var(--color-text-primary);
+	font-size: x-small;
 }
-.op-text {
+.op-button:hover {
+	cursor: pointer;
 }
-
-.entry {
-	background-color: rgba(86, 61, 124, 0.15);
-	border: 1px solid rgba(86, 61, 124, 0.15);
-} */

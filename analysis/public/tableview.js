@@ -125,8 +125,10 @@ async function visitTable(hexBase) {
 					list.length == 1 ? " color-text-primary" : " color-text-warning";
 			}
 			if (udList.length !== 0) {
-				item.classList += " color-bg-danger";
+				item.classList += " op-undocumented";
 			}
+
+			item.classList += " op-button";
 			item.onclick = () => {
 				visitTable(hexBase + subHex);
 			};
