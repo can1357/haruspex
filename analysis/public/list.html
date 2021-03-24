@@ -13,10 +13,7 @@
 		<link rel="stylesheet" href="/static/stylesheet.css" />
 
 		<script src="https://cdn.jsdelivr.net/npm/@finos/perspective/dist/umd/perspective.js"></script>
-		<!-- <link
-			rel="stylesheet"
-			href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer@0.6.2/dist/umd/material.dark.css"
-		/> -->
+		<link rel='stylesheet' href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/umd/material-dense.dark.css">
 
 		<script src="https://unpkg.com/@finos/perspective-viewer"></script>
 		<script src="https://unpkg.com/@finos/perspective-viewer-datagrid"></script>
@@ -30,20 +27,25 @@
 				color: var(--color-text-primary) !important;
 			}
 
-			.psp-positive {
-				color: inherit !important;
-			}
-
-			perspective-viewer /deep/ div#add-computed-expression {
-				display: none !important;
-				visibility: hidden !important;
-			}
+            body {
+                position: fixed;
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                overflow: hidden;
+                touch-action: none;
+            }
 
 			perspective-viewer {
+				position: fixed;
+				left: 5%;
+				top: 10%;
+				height: 80%;
+				width: 90%;
 				font-family: sans-serif;
 				--interface--font-family: sans-serif;
 				--interface-monospace--font-family: monospace;
-				--inactive-column-selector--content: "\E835";
+				/*--inactive-column-selector--content: "\E835";
 				--active-column-selector--content: "\E834";
 				--column--background: none;
 				--column--height: 21px;
@@ -108,7 +110,7 @@
 				--expression--error-color: #f88;
 				--warning--color: #333;
 				--autocomplete-select-background: #555;
-				--autocomplete-hover-background: #444;
+				--autocomplete-hover-background: #444;*/
 			}
 		</style>
 	</head>
@@ -118,9 +120,6 @@
 				<div class="Header-link f4 d-flex flex-items-center">
 					<img src="/static/logo.svg" height="32" width="32" class="mr-2"></img>
 				</div>
-			</div>
-			<div class="Header-item">
-				<input type="search" class="form-control input-dark" />
 			</div>
 			<div class="Header-item">
 				<a href="/" class="Header-link">Grid</a>
