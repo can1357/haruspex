@@ -53,6 +53,8 @@ for (let n = 0; n <= 0xf; n++) {
 const { instructions } = await (await fetch("/static/dataset.json")).json();
 
 async function visitTable(hexBase) {
+	window.history.replaceState(null, "Haruspex - " + hexBase, "/browse/" + hexBase);
+
 	const header = document.getElementById("crumbs");
 	if (hexBase.length) {
 		header.innerHTML = "";
