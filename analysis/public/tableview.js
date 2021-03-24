@@ -78,7 +78,7 @@ async function visitTable(hexBase) {
 
 	// Iterate every opcode.
 	//
-	const optbl = Object.keys(instructions);
+	const scopeTable = Object.keys(instructions).filter((k) => k.startsWith(hexBase));
 	for (let i = 0; i <= 0xff; i++) {
 		// Convert the full and partial opcode to hex.
 		//
@@ -86,7 +86,7 @@ async function visitTable(hexBase) {
 
 		// Filter the table by the opcode.
 		//
-		const list = optbl.filter((k) => k.startsWith(hexBase + subHex));
+		const list = scopeTable.filter((k) => k.startsWith(hexBase + subHex));
 		const udList = list.filter((k) => !instructions[k].valid);
 
 		// Reset the table entry.
