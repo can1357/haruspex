@@ -15,6 +15,11 @@ Haruspex is a project attempting to explore and audit the x86-64 instruction set
 - `/kernel` contains the code responsible for producing this data, note that it is essentially "pseudo-code" due to some of the dependencies and parts of the toolchain I used to build it I cannot share, but should be pretty easy to translate it to work in your OS.
 - `/raw-data` contains the raw data produced by this code on a i7 6850k test machine.
 
+# Thanks to
+
+- @JustasMasiulis for helping with the web components.
+- @H4vC for the name.
+
 # License
 
 Haruspex is licensed under the GNU General Public License v3.
