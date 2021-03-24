@@ -13,40 +13,15 @@
 #define PADDING_OPCODE  0x90
 #define FAULTING_OPCODE 0xCE
 
-static uint8_t testpad_temp[ 256 ];
-[[gnu::noinline, gnu::naked, no_split, code_alignment(64)]] static uint32_t test_pad()
+static uint8_t test_pad_temp[ 256 ] = {};
+[[gnu::noinline, gnu::naked, no_split, code_alignment( 64 )]] static uint32_t test_pad()
 {
-	#define _PAD_1 __emit PADDING_OPCODE } __asm {
-	#define _PAD_4  _PAD_1 _PAD_1 _PAD_1 _PAD_1
 	__asm 
 	{
-		_PAD_4 _PAD_4	          // 43 bytes of padding. (7+14+43=64)
-		_PAD_4 _PAD_4	          //
-		_PAD_4 _PAD_4	          //
-		_PAD_4 _PAD_4	          //
-		_PAD_4 _PAD_4	          //
-		_PAD_1			          //
-		_PAD_1			          //
-		_PAD_1			          //
+		// Save the low 32-bits of the counter.
+		//
+		mov    r9d,  eax
 
-		// Trash the next cacheline.
-		//
-		lea  rax, [rip+next_line] // 14 bytes
-		push qword ptr [rax]	  // 
-		pop  qword ptr [rax]	  //
-		sfence                    //
-
-		// Read the counter.
-		//
-		xor  ecx, ecx	          // 7 bytes
-		lfence			          // 
-		rdpmc			          //
-		next_line:
-		
-		// Save low part of the counter.
-		//
-		mov  r9d, eax
-		
 		// Enter the shadow of the call.
 		//
 		call x
@@ -75,39 +50,41 @@ static uint8_t testpad_temp[ 256 ];
 		
 			// Waste some cycles.
 			//
-			vmovups    ymm0,    [testpad_temp]
-			vmovups    ymm1,    [testpad_temp]
-			vmovups    ymm2,    [testpad_temp]
-			vmovups    ymm3,    [testpad_temp]
+			vmovups    ymm0,    [ test_pad_temp ]
+			vmovups    ymm1,    [ test_pad_temp ]
+			vmovups    ymm2,    [ test_pad_temp ]
+			vmovups    ymm3,    [ test_pad_temp ]
+
 			vzeroupper
-			addps      xmm0,    xmm1
-			vaddps     ymm2,    ymm0,    ymm3
-			vaddps     ymm1,    ymm0,    ymm2
-			vaddps     ymm3,    ymm0,    ymm1
-			vaddps     ymm0,    ymm0,    [testpad_temp]
-			vaddps     ymm1,    ymm0,    [testpad_temp]
-			vaddps     ymm2,    ymm0,    [testpad_temp]
-			vaddps     ymm3,    ymm0,    [testpad_temp]
-			vaddps     ymm0,    ymm0,    ymm1
-			vaddps     ymm2,    ymm0,    ymm3
-			vaddps     ymm1,    ymm0,    ymm2
-			vaddps     ymm3,    ymm0,    ymm1
-			vaddps     ymm0,    ymm0,    [testpad_temp]
-			vaddps     ymm1,    ymm0,    [testpad_temp]
-			vaddps     ymm2,    ymm0,    [testpad_temp]
-			vaddps     ymm3,    ymm0,    [testpad_temp]
-			vaddps     ymm0,    ymm0,    ymm1
-			vaddps     ymm2,    ymm0,    ymm3
-			vaddps     ymm1,    ymm0,    ymm2
-			vaddps     ymm3,    ymm0,    ymm1
-			vaddps     ymm0,    ymm0,    [testpad_temp]
-			vaddps     ymm1,    ymm0,    [testpad_temp]
-			vaddps     ymm2,    ymm0,    [testpad_temp]
-			vaddps     ymm3,    ymm0,    [testpad_temp]
-			vaddps     ymm0,    ymm0,    ymm1
-			vaddps     ymm2,    ymm0,    ymm3
-			vaddps     ymm1,    ymm0,    ymm2
-			vaddps     ymm3,    ymm0,    ymm1
+			addps       xmm0,    xmm1
+
+			vaddps      ymm0,    ymm1,    [ test_pad_temp ]
+			vaddps      ymm1,    ymm2,    [ test_pad_temp ]
+			vaddps      ymm2,    ymm3,    [ test_pad_temp ]
+			vaddps      ymm3,    ymm0,    [ test_pad_temp ]
+			vsqrtpd     ymm0,    ymm0
+			vsqrtpd     ymm1,    ymm1
+			vsqrtpd     ymm2,    ymm2
+			vsqrtpd     ymm3,    ymm3
+
+			vaddps      ymm0,    ymm1,    [ test_pad_temp ]
+			vaddps      ymm1,    ymm2,    [ test_pad_temp ]
+			vaddps      ymm2,    ymm3,    [ test_pad_temp ]
+			vaddps      ymm3,    ymm0,    [ test_pad_temp ]
+			vsqrtpd     ymm0,    ymm0
+			vsqrtpd     ymm1,    ymm1
+			vsqrtpd     ymm2,    ymm2
+			vsqrtpd     ymm3,    ymm3
+				
+			vaddps      ymm0,    ymm1,    [ test_pad_temp ]
+			vaddps      ymm1,    ymm2,    [ test_pad_temp ]
+			vaddps      ymm2,    ymm3,    [ test_pad_temp ]
+			vaddps      ymm3,    ymm0,    [ test_pad_temp ]
+			vsqrtpd     ymm0,    ymm0
+			vsqrtpd     ymm1,    ymm1
+			vsqrtpd     ymm2,    ymm2
+			vsqrtpd     ymm3,    ymm3
+
 			lea        rax,     [rip+z]
 			xchg       [rsp],   rax
 			ret
@@ -120,18 +97,33 @@ static uint8_t testpad_temp[ 256 ];
 		sub  eax,    r9d
 		ret
 	}
-	#undef _PAD_1
-	#undef _PAD_4
+}
+[[gnu::noinline, gnu::naked, no_split]] static uint32_t test_pad_trampoline( uint32_t, uint32_t, const void* dest )
+{
+	__asm 
+	{
+		// Get ecx ready for the counter, serialize and read the counter.
+		//
+		xor    ecx,  ecx
+		movaps xmm0, [r8]
+		movaps [r8], xmm0
+		sfence
+		lfence
+		rdpmc
+		
+		// Jump to the real handler.
+		//
+		jmp    r8
+	}
 }
 
 // Test pad details.
 //
 static constexpr size_t test_pad_padding_size = 15;
 static constexpr size_t test_pad_tail_size = 3;
-static constexpr size_t test_pad_pfx_size = 64;
 static const auto test_pad_location = [ ] ()
 {
-	auto r = test_pad_pfx_size + ( uint8_t* ) &test_pad;
+	auto r = ( uint8_t* ) &test_pad;
 	constexpr auto not_pad = [ ] ( auto b ) { return b != PADDING_OPCODE; };
 	while ( std::find_if( r, r + test_pad_padding_size, not_pad ) != ( r + test_pad_padding_size ) )
 		r++;
@@ -174,10 +166,10 @@ static void run_test( xstd::range<const uint8_t*> instruction,
 		// Flush the iCache for the testpad.
 		//
 		volatile uint8_t* ip = ( xstd::any_ptr ) &test_pad;
-		std::copy_n( ip, 512, ip );
+		std::copy_n( ip, 256, ip );
+		volatile uint8_t* ip2 = ( xstd::any_ptr ) test_pad_trampoline;
+		std::copy_n( ip2, 64, ip2 );
 		ia32::sfence();
-		for ( int64_t n = 512 - 64; n >= 0; n -= 64 )
-			ia32::clflush( ip + n );
 
 		// Repeat until we execute the test with no SMIs delivered.
 		//
@@ -193,7 +185,7 @@ static void run_test( xstd::range<const uint8_t*> instruction,
 
 			// Run through the testpad.
 			//
-			uint32_t lres = test_pad();
+			uint32_t lres = test_pad_trampoline( 0, 0, &test_pad );
 
 			// If the SMI counter did not change, save the result and break.
 			//
@@ -212,11 +204,11 @@ static void run_test( xstd::range<const uint8_t*> instruction,
 
 // Test helpers.
 //
-static double test_out_of_order( xstd::range<const uint8_t*> op )
+inline uint32_t test_out_of_order( xstd::range<const uint8_t*> op )
 {
 	uint32_t results[ 8 ];
 	run_test( op, std::initializer_list<uint8_t>{ 0x0F, 0x5E, 0xE5 }, results, { .event_select = 0x14, .unit_mask = 1 } /*divisor cycles*/ );
-	return xstd::percentile( xstd::sorted_clone( results ), 0.75f );
+	return *xstd::max_element( results );
 }
 static double test_decode( xstd::range<const uint8_t*> op, uint8_t unit_mask )
 {
@@ -252,7 +244,7 @@ struct result_entry
 	uint32_t                        length = 0;
 
 	std::array<double, 3>           uops = { 0 };
-	double                          oo_cycles = 0;
+	uint32_t                        oo_cycles = 0;
 
 	std::string                     decoding = {};
 	bool                            cpl0 = true;
@@ -313,9 +305,17 @@ struct result_entry
 	//
 	auto baseline = test_decode( std::initializer_list<uint8_t>{ 0x90 } );
 	auto baseline_ft = test_decode( std::initializer_list<uint8_t>{ 0xCE } );
+	auto baseline_ft2 = test_decode( std::initializer_list<uint8_t>{ 0x90, 0xCE } );
+	uint64_t nop_uops = baseline_ft2[ 0 ] - baseline_ft[ 0 ];
 	xstd::log( "Baseline          : %s\n", baseline );
 	xstd::log( "Faulting Baseline : %s\n", baseline_ft );
-	if ( baseline_ft[ 1 ] != 0 || baseline[ 1 ] != 0 || ( baseline[ 0 ] - baseline_ft[ 0 ] ) != 15 )
+	xstd::log( "Nop uOps          : %llu\n", nop_uops );
+	if ( !nop_uops  ||                                               // nop did not dispatch through MITE
+		 baseline_ft2[ 2 ] != baseline_ft[ 2 ] ||                    // nop dispatched through MS
+		 baseline_ft[ 1 ] != 0 || 					                 // DBS dispatched instructions
+		 baseline[ 1 ] != 0 ||						                 //
+		 baseline_ft2[ 1 ] != 0 || 					                 //
+		 ( baseline[ 0 ] - baseline_ft[ 0 ] ) != ( 15 * nop_uops ) ) // nop count is unexpected 
 	{
 		xstd::log( "Aborting, invalid.\n" );
 		return 0;
@@ -420,9 +420,11 @@ struct result_entry
 		"{ "
 			"\"nopBaseline\": { \"mits\": %f, \"ms\": %f }, "
 			"\"faultBaseline\": { \"mits\": %f, \"ms\": %f },  "
+			"\"nopUops\": %llu,"
 			"\"data\": [",
 		baseline[ 0 ], baseline[ 2 ],
-		baseline_ft[ 0 ], baseline_ft[ 2 ] 
+		baseline_ft[ 0 ], baseline_ft[ 2 ],
+		nop_uops
 	);
 	for ( auto& result : results )
 		json_result += result.to_json() + ",";

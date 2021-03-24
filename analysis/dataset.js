@@ -32,10 +32,14 @@ const prefixList = [
 	"f3",
 ];
 
+function hexb(v) {
+	return v <= 0xf ? "0" + v.toString(16) : v.toString(16);
+}
+
 function parse(rawData) {
 	// Read and parse the JSON.
 	//
-	const { nopBaseline, faultBaseline, data } = JSON.parse(rawData);
+	const { nopBaseline, faultBaseline, data, nopUops } = JSON.parse(rawData);
 
 	// Parse the entries slightly.
 	//
@@ -65,7 +69,6 @@ function parse(rawData) {
 	const propertyMatch = (i1, i2) => {
 		return (
 			i2.ms == i1.ms &&
-			i2.outOfOrder == i1.outOfOrder &&
 			i2.iclass == i1.iclass &&
 			i2.category == i1.category &&
 			i2.extension == i1.extension &&
@@ -73,7 +76,10 @@ function parse(rawData) {
 			i2.valid == i1.valid
 		);
 	};
-	var prefixPurgeCounter = 0;
+
+	// Purge redundant prefixes.
+	//
+	let prefixPurgeCounter = 0;
 	for (const k1 of Object.keys(instructions)) {
 		// Skip if already deleted.
 		//
@@ -113,30 +119,41 @@ function parse(rawData) {
 
 	// Purge redundant suffixes.
 	//
-	var suffixPurgeCounter = 0;
-	for (const k1 of Object.keys(instructions)) {
-		// Skip if already deleted or not relevant.
-		//
-		const i1 = instructions[k1];
-		if (!i1 || k1.length <= 2 || !i1.valid) {
-			continue;
-		}
+	let suffixPurgeCounter = 0;
+	const keysSorted = Object.keys(instructions).sort(function (a, b) {
+		return a.length - b.length;
+	});
+	for (const key of keysSorted) {
+		const eval = (k1, ki1) => {
+			const i1 = instructions[ki1];
+			if (!i1) {
+				return;
+			}
 
-		// Find maching entries:
-		//
-		for (const k2 of Object.keys(instructions)) {
-			// If it is matching except the last byte:
-			//
-			if (k2.startsWith(k1.substr(0, k1.length - 2)) && k2 != k1) {
-				// If it has matching properties ignoring the length, erase it
-				//
+			let matchCount = 0;
+			for (let n = 0; n <= 0xff; n++) {
+				const k2 = k1 + hexb(n);
 				const i2 = instructions[k2];
-				if (propertyMatch(i1, i2)) {
-					suffixPurgeCounter++;
-					delete instructions[k2];
+				if (!i2) {
+					continue;
+				}
+				if (!propertyMatch(i1, i2)) {
+					matchCount = 0;
+					break;
+				}
+				matchCount++;
+			}
+			if (matchCount != 0) {
+				for (let n = 0; n <= 0xff; n++) {
+					const k2 = k1 + hexb(n);
+					if (k2 != ki1 || k1 in instructions) {
+						delete instructions[k2];
+						suffixPurgeCounter++;
+					}
 				}
 			}
-		}
+		};
+		eval(key.substr(0, key.length - 2), key);
 	}
 
 	// Return the parsed entry.
@@ -147,6 +164,7 @@ function parse(rawData) {
 		suffixPurgeCounter,
 		nopBaseline,
 		faultBaseline,
+		nopUops,
 	};
 }
 
