@@ -1,25 +1,25 @@
-:root {
-	--group-color: #e6db3e;
-	--active-color: #ffffff;
-	--inactive-color: #545454;
-	--prefix-color: #6079ab;
-	--undocumented-color: #6b1313;
+html {
+  height: 100%;
+  margin: 0px;
 }
 
 body {
-	background-color: #212529;
-	height: 100vh;
-	width: 100vw;
+  min-height: 100%;
+  margin: 0px;
 }
 
-.logo {
-	position: fixed;
-	top: 5%;
-	left: 5%;
-	width: 10%;
-	height: 10%;
+main {
+  max-width: 1024px;
+  height: 100%;
 }
 
+td {
+  width: 64px;
+  height: 64px;
+  padding: 0 !important;
+}
+
+/* 
 .grid {
 	width: 64%;
 	height: 64%;
@@ -77,4 +77,4 @@ body {
 .entry {
 	background-color: rgba(86, 61, 124, 0.15);
 	border: 1px solid rgba(86, 61, 124, 0.15);
-}
+} */

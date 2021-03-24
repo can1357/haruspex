@@ -49,6 +49,9 @@ app.use("/static", express.static(__dirname + "/public"));
 app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/public/index.html");
 });
+app.get("/list", (req, res) => {
+	res.sendFile(__dirname + "/public/list.html");
+});
 app.get("/browse/:sub?", (req, res) => {
 	res.sendFile(__dirname + "/public/index.html");
 });

@@ -7,43 +7,35 @@
 			content="width=device-width, initial-scale=1, shrink-to-fit=no"
 		/>
 		<link
+			href="https://unpkg.com/@primer/css@16.0.0-rc.765d5fa/dist/primer.css"
 			rel="stylesheet"
-			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-			crossorigin="anonymous"
 		/>
+
 		<link rel="stylesheet" href="/static/stylesheet.css" />
 		<title>Haruspex</title>
 	</head>
-	<body>
-		<img class="logo" src="/static/logo.svg" />
+	<body class="color-bg-canvas">
+		<div class="Header">
+			<div class="Header-item">
+				<a href="#" class="Header-link f4 d-flex flex-items-center">
+					<span>Haruspex</span>
+				</a>
+			</div>
+			<div class="Header-item">
+				<input type="search" class="form-control input-dark" />
+			</div>
+			<div class="Header-item">
+				<a href="#" class="Header-link">Grid</a>
+			</div>
+			<div class="Header-item">
+				<a href="/list" class="Header-link">List</a>
+			</div>
+		</div>
 
-		<!-- Opcode table -->
-		<table class="table table-bordered table-sm table-dark grid align-middle op-tbl">
-			<thead>
-				<tr>
-					<th id="opcode-table-prev" class="op-tbl-prev" colspan="16"></th>
-				</tr>
-			</thead>
-			<tbody id="opcode-table" class="w-100 h-100"></tbody>
-		</table>
+		<main class="d-flex flex-column mx-auto flex-justify-center mt-6">
+			<regular-table id="table"> </regular-table>
+		</main>
 
-		<script
-			src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-			integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-			integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-			integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-			crossorigin="anonymous"
-		></script>
-
-		<script src="/static/tableview.js"></script>
+		<script src="/static/tableview.js" type="module"></script>
 	</body>
 </html>
