@@ -64,7 +64,7 @@ function parse(rawData) {
 			entry.branch = false;
 			entry.serializing = entry.mits == 0;
 		}
-		entry.speculationFence = entry.outOfOrder == 0;
+		entry.speculationFence = entry.outOfOrder < 4;
 		instructions[entry.opcode] = entry;
 	}
 
