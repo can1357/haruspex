@@ -50,10 +50,17 @@ for (let n = 0; n <= 0xf; n++) {
 
 // Request the dataset.
 //
-const fetchPromise = fetch("/static/dataset.json");
+let dataset = null;
+async function getDataset() {
+	if (dataset) {
+		return dataset;
+	}
+	dataset = await (await fetch("/static/dataset.json")).json();
+	return dataset;
+}
 
 async function visitTable(hexBase) {
-	const { instructions } = await (await fetchPromise).json();
+	const { instructions } = await getDataset();
 
 	window.history.replaceState(null, "Haruspex - " + hexBase, "/browse/" + hexBase);
 
