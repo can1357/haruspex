@@ -1,11 +1,12 @@
 <p align="center">
-
   <img width="256" heigth="256" src="https://haruspex.can.ac/static/logo.svg">
-
-  <h1 align="center">Haruspex</h1>
-  <p align="center">
+   <h1 align="center" style="border-bottom: none">Haruspex</h1>
+   <h4 align="center">/həˈrʌspeks/</h4>
+   <h6 align="center">A religious official in ancient Rome who predicted the future or interpreted the meaning of events by examining the insides of birds or animals that had been sacrificed.</h6>
+   <p align="center">
     Exploration of x86-64 ISA using speculative execution.
-  </p>
+   </p>
+   <h1></h1>
 </p>
 
 Haruspex is a project attempting to explore and audit the x86-64 instruction set by (ab)using speculative execution and certain low-level performance counters Intel CPUs provide mainly for the identification of undocumented opcodes and deducing the pipeline properties of each instruction. You can find the article explaining the methodology [here](https://blog.can.ac/2021/03/22/speculating-x86-64-isa-with-one-weird-trick/).
