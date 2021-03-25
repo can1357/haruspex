@@ -351,7 +351,7 @@ struct result_entry
 			result.iclass = xed_iclass_enum_t2str( dec->get_class() );
 			result.extension = xed_extension_enum_t2str( xed_decoded_inst_get_extension( &*dec ) );
 			result.category = xed_category_enum_t2str( xed_decoded_inst_get_category( &*dec ) );
-			result.valid = xed_decoded_inst_valid_for_chip( &*dec, /*XED_CHIP_SKYLAKE*/ XED_CHIP_CANNONLAKE );
+			result.valid = xed_decoded_inst_valid_for_chip( &*dec, XED_CHIP_CANNONLAKE );
 			result.cpl0 = xed_decoded_inst_get_attribute( &*dec, XED_ATTRIBUTE_RING0 );
 			result.decoding = dec->to_string();
 			result.opcode.resize( std::min( result.opcode.size(), dec->length() ) );
