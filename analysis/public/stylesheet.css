@@ -20,7 +20,9 @@ td {
 	width: 64px;
 	height: 64px;
 	padding: 0 !important;
+	position: relative;
 }
+
 .op-undocumented {
 	border-bottom-color: red !important;
 }
@@ -29,10 +31,16 @@ td {
 	color: var(--color-text-primary);
 	font-size: x-small;
 }
+
 .op-entry {
 	color: var(--color-text-primary);
 	font-size: x-small;
 }
+
 .op-button:hover {
 	cursor: pointer;
+}
+
+.Popover-message {
+	cursor: initial;
 }
