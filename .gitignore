@@ -3,3 +3,6 @@ raw-data/*.cache*
 package-lock.json
 raw-data/*.json
 .vscode/
+*.ai
+
+analysis/public/dataset.json

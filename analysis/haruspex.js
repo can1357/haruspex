@@ -1,5 +1,6 @@
 const dataset = require("./dataset");
 const yargs = require("yargs");
+const compression = require("compression");
 const path = require("path");
 const express = require("express");
 const fs = require("fs");
@@ -41,25 +42,30 @@ if (!argv._.includes("start")) {
 	return;
 }
 
-const data = dataset.load(argv.dataset || "./raw-data/isa.json");
-console.log(data);
+// Write the dataset to static path.
+//
+const staticPath = __dirname + "/public";
+const data = dataset.load(argv.dataset || __dirname + "/../raw-data/isa.json");
+fs.writeFileSync(staticPath + "/dataset.json", JSON.stringify(data));
 
+// Declare the endpoints.
+//
 const app = express();
-app.use("/static", express.static(path.join(__dirname, "public")));
-
+app.use(compression());
+app.use("/static", express.static(staticPath));
 app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/public/index.html");
+	res.sendFile(staticPath + "/index.html");
+});
+app.get("/list", (req, res) => {
+	res.sendFile(staticPath + "/list.html");
 });
 app.get("/browse/:sub?", (req, res) => {
-	res.sendFile(__dirname + "/public/index.html");
+	res.sendFile(staticPath + "/index.html");
 });
 
-const datasetResult = JSON.stringify(data);
-app.get("/dataset.json", (req, res) => {
-	res.send(datasetResult);
-});
-
+// Start listening.
+//
 const port = argv.port || 80;
 app.listen(port, () => {
-	console.log(`Example app listening at http://localhost:${port}`);
+	console.log(`Listening at http://localhost:${port}`);
 });

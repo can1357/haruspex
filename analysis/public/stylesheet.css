@@ -1,72 +1,38 @@
-:root {
-	--group-color: #e6db3e;
-	--active-color: #ffffff;
-	--inactive-color: #545454;
-	--prefix-color: #6079ab;
-	--undocumented-color: #6b1313;
+html {
+	height: 100%;
+	margin: 0px;
 }
 
 body {
-	background-color: #212529;
-	height: 100vh;
-	width: 100vw;
+	min-height: 100%;
+	margin: 0px;
 }
 
-.grid {
-	width: 64%;
-	height: 64%;
-	position: fixed;
-	top: 18%;
-	left: 18%;
+main {
+	height: 100%;
 }
 
-.op-tbl {
-	table-layout: fixed !important;
-}
-.op-td {
-	width: 4%;
-	height: 4%;
-}
-.op-td:hover {
-	background-color: #33383f !important;
-}
-.op-td:not(.op-inactive):hover {
-	cursor: pointer;
+.grid-main {
+	max-width: 1024px;
 }
 
-.op-tbl-prev {
-	user-select: none;
-	height: 4%;
-}
-.op-tbl-prev-button {
-	cursor: pointer;
-}
-
-.op-group {
-	color: var(--group-color);
-}
-.op-active {
-	color: var(--active-color);
-}
-.op-inactive {
-	color: var(--inactive-color);
-}
-.op-prefix {
-	color: var(--prefix-color);
+td {
+	width: 64px;
+	height: 64px;
+	padding: 0 !important;
 }
 .op-undocumented {
-	border-bottom-color: var(--undocumented-color) !important;
+	border-bottom-color: red !important;
 }
+
 .op-counter {
+	color: var(--color-text-primary);
 	font-size: x-small;
 }
 .op-entry {
-	font-size: xx-small;
+	color: var(--color-text-primary);
+	font-size: x-small;
 }
-.op-text {
-}
-
-.entry {
-	background-color: rgba(86, 61, 124, 0.15);
-	border: 1px solid rgba(86, 61, 124, 0.15);
+.op-button:hover {
+	cursor: pointer;
 }

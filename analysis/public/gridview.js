@@ -50,35 +50,41 @@ for (let n = 0; n <= 0xf; n++) {
 
 // Request the dataset.
 //
-const datasetPromise = new Promise((res, rej) => {
-	$.getJSON("/dataset.json", function (data) {
-		res(data);
-	});
-});
+let dataset = null;
+async function getDataset() {
+	if (dataset) {
+		return dataset;
+	}
+	dataset = await (await fetch("/static/dataset.json")).json();
+	return dataset;
+}
 
 async function visitTable(hexBase) {
-	// Wait for the dataset to load.
-	//
-	const { instructions } = await datasetPromise;
+	const { instructions } = await getDataset();
 
-	const header = document.getElementById("opcode-table-prev");
+	window.history.replaceState(null, "Haruspex - " + hexBase, "/browse/" + hexBase);
+
+	const header = document.getElementById("crumbs");
 	if (hexBase.length) {
-		header.innerHTML = "Viewing " + hexBase + "* ";
+		header.innerHTML = "";
 
-		const button = document.createElement("span");
-		button.onclick = () => {
-			visitTable(hexBase.substr(0, hexBase.length - 2));
-		};
-		button.classList = "op-tbl-prev-button";
-		button.innerText = "(Back)";
-		header.appendChild(button);
+		for (let i = 0; i < hexBase.length; i += 2) {
+			header.insertAdjacentHTML(
+				"beforeend",
+				`<li class="breadcrumb-item op-button"><a>${hexBase.substr(i, 2)}</a></li>`
+			);
+
+			header.lastChild.onclick = () => {
+				visitTable(hexBase.substr(0, i));
+			};
+		}
 	} else {
-		header.innerHTML = "Viewing all entries.";
+		header.innerHTML = `<span class="path-divider">/</span>`;
 	}
 
 	// Iterate every opcode.
 	//
-	const scopeTable = Object.keys(instructions).filter((k) => k.startsWith(hexBase));
+	const optbl = Object.keys(instructions).filter((k) => k.startsWith(hexBase));
 	for (let i = 0; i <= 0xff; i++) {
 		// Convert the full and partial opcode to hex.
 		//
@@ -86,13 +92,15 @@ async function visitTable(hexBase) {
 
 		// Filter the table by the opcode.
 		//
-		const list = scopeTable.filter((k) => k.substr(hexBase.length, 2) === subHex);
+		const list = optbl.filter(
+			(k) => k[hexBase.length] === subHex[0] && k[hexBase.length + 1] === subHex[1]
+		);
 		const udList = list.filter((k) => !instructions[k].valid);
 
 		// Reset the table entry.
 		//
 		const item = opcodes[i];
-		item.classList = "op-td align-middle text-center";
+		item.classList = "border op-td align-middle text-center";
 		while (item.firstChild) {
 			item.removeChild(item.firstChild);
 		}
@@ -126,18 +134,21 @@ async function visitTable(hexBase) {
 		//
 		if (list.length !== 0) {
 			if (hexBase === "" && prefixList.includes(hexb(i))) {
-				item.classList += " op-prefix";
+				item.classList += " color-text-link";
 			} else if (list.length !== 0) {
-				item.classList += list.length == 1 ? " op-active" : " op-group";
+				item.classList +=
+					list.length == 1 ? " color-text-primary" : " color-text-warning";
 			}
 			if (udList.length !== 0) {
 				item.classList += " op-undocumented";
 			}
+
+			item.classList += " op-button";
 			item.onclick = () => {
 				visitTable(hexBase + subHex);
 			};
 		} else {
-			item.classList += " op-inactive";
+			item.classList += " color-text-tertiary color-bg-tertiary";
 			item.onclick = () => {};
 		}
 	}

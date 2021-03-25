@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-color-mode="dark" data-light-theme="light" data-dark-theme="dark">
 	<head>
 		<meta charset="utf-8" />
 		<meta
@@ -7,41 +7,41 @@
 			content="width=device-width, initial-scale=1, shrink-to-fit=no"
 		/>
 		<link
+			href="https://unpkg.com/@primer/css@16.0.0-rc.765d5fa/dist/primer.css"
 			rel="stylesheet"
-			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-			crossorigin="anonymous"
 		/>
+		<link rel="icon" href="/static/logo.svg" sizes="any" type="image/svg+xml">
 		<link rel="stylesheet" href="/static/stylesheet.css" />
 		<title>Haruspex</title>
 	</head>
-	<body>
-		<!-- Opcode table -->
-		<table class="table table-bordered table-sm table-dark grid align-middle op-tbl">
-			<thead>
-				<tr>
-					<th id="opcode-table-prev" class="op-tbl-prev" colspan="16"></th>
-				</tr>
-			</thead>
-			<tbody id="opcode-table" class="w-100 h-100"></tbody>
-		</table>
+	<body class="color-bg-canvas">
+		<div class="Header">
+			<div class="Header-item">
+				<a href="/" class="Header-link f4 d-flex flex-items-center">
+					<img src="/static/logo.svg" height="32" width="32" class="mr-2"></img>
+				</a>
+			</div>
+			<div class="Header-item">
+				<a href="/" class="Header-link">Grid</a>
+			</div>
+			<div class="Header-item">
+				<a href="/list" class="Header-link">List</a>
+			</div>
+			<div class="Header-item">
+				<a href="https://github.com/can1357/haruspex/" class="Header-link">Github</a>
+			</div>
+		</div>
 
-		<script
-			src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-			integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-			integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-			integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-			crossorigin="anonymous"
-		></script>
+		<main class="d-flex flex-column mx-auto flex-justify-center mt-6 grid-main">
+			<nav aria-label="Breadcrumb">
+				<ol id="crumbs" class="f3"></ol>
+			</nav>
 
-		<script src="/static/tableview.js"></script>
+			<table class="mt-3" cellspacing="0" cellpadding="0">
+				<tbody id="opcode-table" class="w-100 h-100"></tbody>
+			</table>
+		</main>
+
+		<script src="/static/gridview.js" type="module"></script>
 	</body>
 </html>

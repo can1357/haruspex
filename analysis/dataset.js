@@ -32,40 +32,97 @@ const prefixList = [
 	"f3",
 ];
 
+function hexb(v) {
+	return v <= 0xf ? "0" + v.toString(16) : v.toString(16);
+}
+
 function parse(rawData) {
 	// Read and parse the JSON.
 	//
-	const { nopBaseline, faultBaseline, data } = JSON.parse(rawData);
+	const { nopBaseline, faultBaseline, data, nopUops } = JSON.parse(rawData);
 
 	// Parse the entries slightly.
 	//
 	const instructions = {};
 	for (const entry of data) {
 		entry.opcode = Buffer.from(entry.opcode).toString("hex");
-		entry.mits = entry.uops[0] | 0;
-		entry.ms = entry.uops[2] | 0;
+		entry.mits = entry.uops[0] - faultBaseline.mits;
+		entry.ms = entry.uops[2] - faultBaseline.ms;
 		delete entry.uops;
 
-		if (entry.ms < nopBaseline.ms) {
+		if (
+			entry.ms < 0 ||
+			entry.mits < 0 ||
+			entry.category.includes("_BR") ||
+			entry.category.includes("CALL_")
+		) {
 			entry.branch = true;
-			entry.serializing = entry.mits <= faultBaseline.mits;
-		} else if (entry.mits <= faultBaseline.mits) {
-			entry.branch = null;
-			entry.serializing = true;
+			entry.serializing = null;
+			entry.ms = 0;
+			entry.mits = 0;
 		} else {
 			entry.branch = false;
-			entry.serializing = false;
+			entry.serializing = entry.mits == 0;
 		}
 		entry.speculationFence = entry.outOfOrder == 0;
 		instructions[entry.opcode] = entry;
 	}
 
-	// Purge reduntant prefixes.
-	//
 	const propertyMatch = (i1, i2) => {
-		return i2.ms == i1.ms && i2.outOfOrder == i1.outOfOrder && i2.iclass == i1.iclass;
+		return (
+			i2.ms == i1.ms &&
+			i2.iclass == i1.iclass &&
+			i2.category == i1.category &&
+			i2.extension == i1.extension &&
+			i2.cpl == i1.cpl &&
+			i2.valid == i1.valid
+		);
 	};
-	var prefixPurgeCounter = 0;
+
+	// Purge redundant suffixes.
+	//
+	let suffixPurgeCounter = 0;
+	const keysSorted = Object.keys(instructions).sort(function (a, b) {
+		return a.length - b.length;
+	});
+	for (const key of keysSorted) {
+		const evaluate = (k1, ki1) => {
+			const i1 = instructions[ki1];
+			if (!i1) {
+				return;
+			}
+
+			let matches = [];
+			for (let n = 0; n <= 0xff; n++) {
+				const k2 = k1 + hexb(n);
+				const i2 = instructions[k2];
+				if (i2 && propertyMatch(i1, i2)) {
+					matches.push(k2);
+				}
+			}
+
+			if (matches.length < 256) {
+				return false;
+			}
+
+			let success = false;
+			for (const k2 of matches) {
+				if (k2 != ki1) {
+					delete instructions[k2];
+					suffixPurgeCounter++;
+					success = true;
+				}
+			}
+			return success;
+		};
+		if (evaluate(key, key) || key.length > 2) {
+			evaluate(key.substr(0, key.length - 2), key);
+		}
+	}
+
+	// Purge redundant prefixes.
+	//
+	let prefixPurgeCounter = 0;
 	for (const k1 of Object.keys(instructions)) {
 		// Skip if already deleted.
 		//
@@ -89,7 +146,7 @@ function parse(rawData) {
 					// Otherwise MITS#1 has to be one more than MITS#2 since it should execute one more NOP.
 					//
 					if (i1.mits != i2.mits) {
-						if (i1.mits != i2.mits + 1) {
+						if (i1.mits != i2.mits + nopUops) {
 							continue;
 						}
 					} else if (i1.mits > faultBaseline.mits) {
@@ -103,42 +160,13 @@ function parse(rawData) {
 		}
 	}
 
-	// Purge redundant suffixes.
-	//
-	var suffixPurgeCounter = 0;
-	for (const k1 of Object.keys(instructions)) {
-		// Skip if already deleted or not relevant.
-		//
-		const i1 = instructions[k1];
-		if (!i1 || k1.length <= 2 || !k1.endsWith("90")) {
-			continue;
-		}
-
-		// Find maching entries:
-		//
-		for (const k2 of Object.keys(instructions)) {
-			// If it is matching except the last byte:
-			//
-			if (k2.startsWith(k1.substr(0, k1.length - 2)) && k2 != k1) {
-				// If it has matching properties ignoring the length, erase it
-				//
-				const i2 = instructions[k2];
-				if (propertyMatch(i1, i2)) {
-					suffixPurgeCounter++;
-					delete instructions[k2];
-				}
-			}
-		}
-	}
-
 	// Return the parsed entry.
 	//
 	return {
 		instructions,
 		prefixPurgeCounter,
 		suffixPurgeCounter,
-		nopBaseline,
-		faultBaseline,
+		nopUops,
 	};
 }
 
@@ -154,7 +182,7 @@ function load(path, noCache = false) {
 	const data = fs.readFileSync(path);
 	const sha256 = crypto.createHash("sha256");
 	sha256.update(data);
-	const hash = sha256.digest().toString("hex").substr(0, 4);
+	const hash = sha256.digest().toString("hex").substr(0, 8);
 
 	// See if there is a cached instance, if so return without parsing.
 	//
