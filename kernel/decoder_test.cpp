@@ -85,6 +85,51 @@ static uint8_t test_pad_temp[ 256 ] = {};
 			vsqrtpd     ymm2,    ymm2
 			vsqrtpd     ymm3,    ymm3
 
+			vaddps      ymm0,    ymm1,    [ test_pad_temp ]
+			vaddps      ymm1,    ymm2,    [ test_pad_temp ]
+			vaddps      ymm2,    ymm3,    [ test_pad_temp ]
+			vaddps      ymm3,    ymm0,    [ test_pad_temp ]
+			vsqrtpd     ymm0,    ymm0
+			vsqrtpd     ymm1,    ymm1
+			vsqrtpd     ymm2,    ymm2
+			vsqrtpd     ymm3,    ymm3
+
+			vaddps      ymm0,    ymm1,    [ test_pad_temp ]
+			vaddps      ymm1,    ymm2,    [ test_pad_temp ]
+			vaddps      ymm2,    ymm3,    [ test_pad_temp ]
+			vaddps      ymm3,    ymm0,    [ test_pad_temp ]
+			vsqrtpd     ymm0,    ymm0
+			vsqrtpd     ymm1,    ymm1
+			vsqrtpd     ymm2,    ymm2
+			vsqrtpd     ymm3,    ymm3
+				
+			vaddps      ymm0,    ymm1,    [ test_pad_temp ]
+			vaddps      ymm1,    ymm2,    [ test_pad_temp ]
+			vaddps      ymm2,    ymm3,    [ test_pad_temp ]
+			vaddps      ymm3,    ymm0,    [ test_pad_temp ]
+			vsqrtpd     ymm0,    ymm0
+			vsqrtpd     ymm1,    ymm1
+			vsqrtpd     ymm2,    ymm2
+			vsqrtpd     ymm3,    ymm3
+
+			vaddps      ymm0,    ymm1,    [ test_pad_temp ]
+			vaddps      ymm1,    ymm2,    [ test_pad_temp ]
+			vaddps      ymm2,    ymm3,    [ test_pad_temp ]
+			vaddps      ymm3,    ymm0,    [ test_pad_temp ]
+			vsqrtpd     ymm0,    ymm0
+			vsqrtpd     ymm1,    ymm1
+			vsqrtpd     ymm2,    ymm2
+			vsqrtpd     ymm3,    ymm3
+				
+			vaddps      ymm0,    ymm1,    [ test_pad_temp ]
+			vaddps      ymm1,    ymm2,    [ test_pad_temp ]
+			vaddps      ymm2,    ymm3,    [ test_pad_temp ]
+			vaddps      ymm3,    ymm0,    [ test_pad_temp ]
+			vsqrtpd     ymm0,    ymm0
+			vsqrtpd     ymm1,    ymm1
+			vsqrtpd     ymm2,    ymm2
+			vsqrtpd     ymm3,    ymm3
+
 			lea        rax,     [rip+z]
 			xchg       [rsp],   rax
 			ret
@@ -165,11 +210,15 @@ static void run_test( xstd::range<const uint8_t*> instruction,
 	{
 		// Flush the iCache for the testpad.
 		//
-		volatile uint8_t* ip = ( xstd::any_ptr ) &test_pad;
-		std::copy_n( ip, 256, ip );
-		volatile uint8_t* ip2 = ( xstd::any_ptr ) test_pad_trampoline;
-		std::copy_n( ip2, 64, ip2 );
-		ia32::sfence();
+		constexpr auto invalidate = [ ] ( xstd::any_ptr ip, size_t length )
+		{
+			std::copy_n( ( volatile uint8_t* ) ip, length, ( volatile uint8_t* ) ip );
+			ia32::sfence();
+			for ( size_t n = 0; n < length; n += 64 )
+				ia32::clflush( ip + n );
+		};
+		invalidate( &test_pad, 512 );
+		invalidate( &test_pad_trampoline, 128 );
 
 		// Repeat until we execute the test with no SMIs delivered.
 		//
@@ -351,7 +400,7 @@ struct result_entry
 			result.iclass = xed_iclass_enum_t2str( dec->get_class() );
 			result.extension = xed_extension_enum_t2str( xed_decoded_inst_get_extension( &*dec ) );
 			result.category = xed_category_enum_t2str( xed_decoded_inst_get_category( &*dec ) );
-			result.valid = xed_decoded_inst_valid_for_chip( &*dec, XED_CHIP_CANNONLAKE );
+			result.valid = xed_decoded_inst_valid_for_chip( &*dec, XED_CHIP_SKYLAKE );
 			result.cpl0 = xed_decoded_inst_get_attribute( &*dec, XED_ATTRIBUTE_RING0 );
 			result.decoding = dec->to_string();
 			result.opcode.resize( std::min( result.opcode.size(), dec->length() ) );
@@ -416,14 +465,23 @@ struct result_entry
 	}
 	xstd::log( "Experiment complete!\n" );
 
+	// Get the CPU brand.
+	//
+	std::array<uint32_t, 13> cpu_brand = { 0 };
+	std::copy_n( ia32::query_cpuid( 0x80000002 ).data(), 4, cpu_brand.data() );
+	std::copy_n( ia32::query_cpuid( 0x80000003 ).data(), 4, cpu_brand.data() + 4 );
+	std::copy_n( ia32::query_cpuid( 0x80000004 ).data(), 4, cpu_brand.data() + 8 );
+
 	// Dump the results into JSON format.
 	//
 	std::string json_result = xstd::fmt::str(
 		"{ "
+		    "\"brand\": \"%s\", "
 			"\"nopBaseline\": { \"mits\": %f, \"ms\": %f }, "
 			"\"faultBaseline\": { \"mits\": %f, \"ms\": %f },  "
 			"\"nopUops\": %llu,"
 			"\"data\": [",
+		( const char* ) cpu_brand.data(),
 		baseline[ 0 ], baseline[ 2 ],
 		baseline_ft[ 0 ], baseline_ft[ 2 ],
 		nop_uops
