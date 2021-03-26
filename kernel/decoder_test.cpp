@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_set>
 #include <initializer_list>
+#include "ia32.hpp"
 
 // Test pad implementation.
 //
@@ -357,10 +358,12 @@ struct result_entry
 	auto baseline_ft2 = test_decode( std::initializer_list<uint8_t>{ 0x90, 0xCE } );
 	auto baseline_div = test_out_of_order( std::initializer_list<uint8_t>{ 0xCE } );
 	uint64_t nop_uops = baseline_ft2[ 0 ] - baseline_ft[ 0 ];
+	
 	xstd::log( "Baseline          : %s\n", baseline );
 	xstd::log( "Faulting Baseline : %s\n", baseline_ft );
 	xstd::log( "Nop uOps          : %llu\n", nop_uops );
 	xstd::log( "Div baseline      : %llu\n", baseline_div );
+	
 	if ( !nop_uops  ||                                               // nop did not dispatch through MITE
 		 baseline_ft2[ 2 ] != baseline_ft[ 2 ] ||                    // nop dispatched through MS
 		 baseline_ft[ 1 ] != 0 || 					                 // DBS dispatched instructions
