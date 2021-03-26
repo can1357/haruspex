@@ -1,3 +1,19 @@
+// Find the chip we're browsing from the URL, adjust the nav-bar and define the dataset getter.
+//
+const { chip, opcode } = window.location.href.match(
+	/.*\/chip\/(?<chip>.*?)\/list[\/]?(?<opcode>.*)/m
+).groups;
+document.getElementById("grid-link").href = `/chip/${chip}/grid`;
+document.getElementById("list-link").href = `/chip/${chip}/list`;
+let dataset = null;
+async function getDataset() {
+	if (dataset) {
+		return dataset;
+	}
+	dataset = await (await fetch(`/static/dataset-${chip}.json`)).json();
+	return dataset;
+}
+
 //prettier-ignore
 const header = [
     { key: "opcode",           title: "Opcode",            detail: "Sample byte array" },
@@ -19,8 +35,7 @@ document.addEventListener("WebComponentsReady", async () => {
 	const el = document.getElementsByTagName("perspective-viewer")[0];
 	const worker = perspective.worker();
 
-	const data = await (await fetch("/static/dataset.json")).json();
-
+	const data = await getDataset();
 	const transformedData = [];
 	for (const op of Object.keys(data.instructions)) {
 		const instruction = data.instructions[op];

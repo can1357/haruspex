@@ -1,3 +1,19 @@
+// Find the chip we're browsing from the URL, adjust the nav-bar and define the dataset getter.
+//
+const { chip, opcode } = window.location.href.match(
+	/.*\/chip\/(?<chip>.*?)\/grid[\/]?(?<opcode>.*)/m
+).groups;
+document.getElementById("grid-link").href = `/chip/${chip}/grid`;
+document.getElementById("list-link").href = `/chip/${chip}/list`;
+let dataset = null;
+async function getDataset() {
+	if (dataset) {
+		return dataset;
+	}
+	dataset = await (await fetch(`/static/dataset-${chip}.json`)).json();
+	return dataset;
+}
+
 //prettier-ignore
 const data_schema = [
     { key: "opcode",           title: "Opcode",            detail: "Sample byte array" },
@@ -65,17 +81,6 @@ for (let n = 0; n <= 0xf; n++) {
 	tbl.appendChild(row);
 }
 
-// Request the dataset.
-//
-let dataset = null;
-async function getDataset() {
-	if (dataset) {
-		return dataset;
-	}
-	dataset = await (await fetch("/static/dataset.json")).json();
-	return dataset;
-}
-
 function eventIntersects(event, elem) {
 	if (!elem) return false;
 
@@ -105,7 +110,11 @@ function checkPopoverForClose(event) {
 async function visitTable(hexBase) {
 	const { instructions } = await getDataset();
 
-	window.history.replaceState(null, "Haruspex - " + hexBase, "/browse/" + hexBase);
+	window.history.replaceState(
+		null,
+		"Haruspex - " + hexBase,
+		`/chip/${chip}/grid/${hexBase}`
+	);
 
 	const header = document.getElementById("crumbs");
 	if (hexBase.length) {
@@ -241,14 +250,4 @@ document.addEventListener("click", (event) => {
 
 // Build the table with the original location.
 //
-const browseBaseUrl = "browse/";
-const browseOffset = window.location.href.indexOf(browseBaseUrl);
-let hexBase = "";
-if (browseOffset != -1) {
-	const suffix = window.location.href.substr(browseOffset + browseBaseUrl.length);
-	for (let base = parseInt(suffix, 16); !isNaN(base) && base !== 0; base >>= 8) {
-		const digit = base & 0xff;
-		hexBase = hexb(digit) + hexBase;
-	}
-}
-visitTable(hexBase);
+visitTable(opcode);

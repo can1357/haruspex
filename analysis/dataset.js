@@ -39,7 +39,7 @@ function hexb(v) {
 function parse(rawData) {
 	// Read and parse the JSON.
 	//
-	const { nopBaseline, faultBaseline, data, nopUops } = JSON.parse(rawData);
+	const { nopBaseline, brand, faultBaseline, data, nopUops } = JSON.parse(rawData);
 
 	// Parse the entries slightly.
 	//
@@ -163,6 +163,7 @@ function parse(rawData) {
 	// Return the parsed entry.
 	//
 	return {
+		brand,
 		instructions,
 		prefixPurgeCounter,
 		suffixPurgeCounter,

@@ -4,6 +4,7 @@ const compression = require("compression");
 const path = require("path");
 const express = require("express");
 const fs = require("fs");
+const staticPath = __dirname + "/public";
 
 // Parse the arguments.
 //
@@ -17,7 +18,7 @@ const argv = yargs
 	})
 	.command("start", "Starts the interactive server.", {
 		dataset: {
-			description: "path to the dataset",
+			description: "path to the dataset directory",
 			alias: "f",
 			type: "string",
 		},
@@ -30,7 +31,7 @@ const argv = yargs
 	.help()
 	.alias("help", "h").argv;
 
-// If requested to process a data:
+// If requested to process a dataset:
 //
 if (argv._.includes("process")) {
 	fs.writeFileSync(argv.file, JSON.stringify(dataset.load(argv.dataset, true)));
@@ -42,11 +43,22 @@ if (!argv._.includes("start")) {
 	return;
 }
 
-// Write the dataset to static path.
+// Discover all datasets.
 //
-const staticPath = __dirname + "/public";
-const data = dataset.load(argv.dataset || __dirname + "/../raw-data/isa.json");
-fs.writeFileSync(staticPath + "/dataset.json", JSON.stringify(data));
+const datasetdir = argv.dataset || __dirname + "/../raw-data/";
+const datasetEntries = fs
+	.readdirSync(datasetdir)
+	.filter((k) => k.startsWith("isa-") && k.endsWith(".json"))
+	.map((e) => ({ name: e.substr(4, e.length - 9), path: path.join(datasetdir, e) }));
+
+// Process and save all datasets to the static data path.
+//
+const datasetList = [];
+for (const { name, path } of datasetEntries) {
+	const data = dataset.load(path);
+	fs.writeFileSync(staticPath + `/dataset-${name}.json`, JSON.stringify(data));
+	datasetList.push({ id: name, brand: data.brand });
+}
 
 // Declare the endpoints.
 //
@@ -56,11 +68,17 @@ app.use("/static", express.static(staticPath));
 app.get("/", (req, res) => {
 	res.sendFile(staticPath + "/index.html");
 });
-app.get("/list", (req, res) => {
+app.get("/datasets.json", (req, res) => {
+	res.send(JSON.stringify(datasetList));
+});
+app.get("/chip/:chip", (req, res) => {
+	res.redirect("/chip/" + req.params.chip + "/grid/");
+});
+app.get("/chip/:chip/list", (req, res) => {
 	res.sendFile(staticPath + "/list.html");
 });
-app.get("/browse/:sub?", (req, res) => {
-	res.sendFile(staticPath + "/index.html");
+app.get("/chip/:chip/grid/:sub?", (req, res) => {
+	res.sendFile(staticPath + "/grid.html");
 });
 
 // Start listening.

@@ -22,20 +22,30 @@
 				</a>
 			</div>
 			<div class="Header-item">
+				<a id="grid-link" href="#" class="Header-link">Grid</a>
+			</div>
+			<div class="Header-item">
+				<a id="list-link" href="#" class="Header-link">List</a>
+			</div>
+			<div class="Header-item">
 				<a href="https://github.com/can1357/haruspex/" class="Header-link">Github</a>
 			</div>
 		</div>
 
 		<main class="d-flex flex-column mx-auto flex-justify-center mt-6 grid-main">
-			<div class="flash flash-full flash-success mb-4">
-				Choose a chip below to browse the data.
+			<div class="flash mb-4">
+				Click on cells to see information about instruction or the next instruction group.
 			</div>
 
-			<nav class="menu" id= "chip-table">
+			<nav aria-label="Breadcrumb">
+				<ol id="crumbs" class="f3"></ol>
 			</nav>
 
-			<script src="/static/chipview.js" type="module"></script>
+			<table class="mt-2" cellspacing="0" cellpadding="0">
+				<tbody id="opcode-table" class="w-100 h-100"></tbody>
+			</table>
 		</main>
 
+		<script src="/static/gridview.js" type="module"></script>
 	</body>
 </html>
