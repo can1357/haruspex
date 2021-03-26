@@ -80,6 +80,9 @@ app.get("/chip/:chip/list", (req, res) => {
 app.get("/chip/:chip/grid/:sub?", (req, res) => {
 	res.sendFile(staticPath + "/grid.html");
 });
+app.get("*", function (req, res) {
+	res.redirect("/");
+});
 
 // Start listening.
 //
