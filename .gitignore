@@ -1,8 +1,16 @@
 node_modules/
-raw-data/*.cache*
-package-lock.json
-raw-data/*.json
 .vscode/
 *.ai
 
-analysis/public/dataset*.json
+# Data files (large, zipped in repo)
+data/*.json
+data/*.cache*
+
+# Generated
+public/dataset*.json
+public/datasets.json
+dist/
+
+# Lockfiles
+package-lock.json
+bun.lock

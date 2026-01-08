@@ -1,0 +1,26 @@
+{
+   "name": "haruspex",
+   "version": "2.0.0",
+   "description": "Static site generator and dev server for the Haruspex x86-64 ISA explorer.",
+   "type": "module",
+   "scripts": {
+      "generate": "bun src/generate.ts",
+      "dev": "bun run generate && vite",
+      "build": "bun run generate && vite build",
+      "preview": "vite preview",
+      "check": "biome check .",
+      "fix": "biome check --write ."
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/can1357/haruspex.git"
+   },
+   "author": "Can Bölük",
+   "license": "GPL-3.0-or-later",
+   "devDependencies": {
+      "@biomejs/biome": "^2.0.0",
+      "@types/bun": "^1.1.0",
+      "typescript": "^5.7.0",
+      "vite": "^6.0.0"
+   }
+}
